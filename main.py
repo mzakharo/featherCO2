@@ -45,6 +45,7 @@ sgp30.set_iaq_baseline(0x8973, 0x8AAE)
 
 elapsed_sec = 0
 wdt.feed()
+con.subscribe(b"house/sgp30")
 while True:
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
     d = dict(eCO2=sgp30.eCO2, TVOC=sgp30.TVOC)
@@ -56,6 +57,7 @@ while True:
     print(d)
     try:
         con.publish(b'house/sgp30', json.dumps(d))
+        con.wait_msg()
     except OSError as e:
         print('err', e)
     time.sleep(1)
