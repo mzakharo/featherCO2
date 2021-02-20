@@ -53,7 +53,8 @@ try:
             d['baseline_TVOC'] = sgp30.baseline_TVOC
         print(d)
         try:
-            con.publish(b'house/sgp30', json.dumps(d), qos=1)
+            if d['eCO2'] != 400: #magic uninitialized value
+                con.publish(b'house/sgp30', json.dumps(d), qos=1)
             err_cnt = 0
         except Exception as e:
             print(e)
