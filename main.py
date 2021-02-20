@@ -41,6 +41,7 @@ wdt.feed()
 #con.subscribe(b"house/sgp30")
 con.publish(b'house/sgp30', json.dumps(dict(boot=1)))
 try:
+    err_cnt = 0
     elapsed_sec = 0
     while True:
         #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
@@ -51,8 +52,15 @@ try:
             d['baseline_eCO2'] = sgp30.baseline_eCO2
             d['baseline_TVOC'] = sgp30.baseline_TVOC
         print(d)
-        con.publish(b'house/sgp30', json.dumps(d), qos=1)
-        wdt.feed()
+        try:
+            con.publish(b'house/sgp30', json.dumps(d), qos=1)
+            err_cnt = 0
+        except Exception as e:
+            print(e)
+            err_cnt += 1
+            con.publish(b'house/sgp30', json.dumps(dict(error=err_cnt)))
+        if err_cnt < 10:
+            wdt.feed()
         time.sleep(1)
 finally:
     con.disconnect()
