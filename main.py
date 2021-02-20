@@ -1,4 +1,4 @@
-from umqtt.simple import MQTTClient
+from umqtt.robust import MQTTClient
 import network
 import utime as time
 import ujson as json
@@ -13,20 +13,27 @@ sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
 sta_if.connect('wireless', 'W@terl004ever')
 print('connecting to wifi')
+count = 0
 while not sta_if.isconnected():
     time.sleep(0.1)
     print('.', end='')
-    wdt.feed()
+    count += 1
+    if count < 100:
+        wdt.feed()
+
 
 print('connected.')
 print(sta_if.ifconfig())
 
+
+echo = 10
 def sub_cb(topic, msg):
+    global echo
+    echo = 10
     print((topic, msg))
 con = MQTTClient("umqtt_client", "192.168.50.91")
 # Print diagnostic messages when retries/reconnects happens
 con.set_callback(sub_cb)
-wdt.feed()
 con.connect()
 wdt.feed()
 
@@ -56,11 +63,13 @@ while True:
         d['baseline_TVOC'] = sgp30.baseline_TVOC
     print(d)
     try:
+        echo -= 1
         con.publish(b'house/sgp30', json.dumps(d))
         con.wait_msg()
+        if echo > 0:
+            wdt.feed()
     except OSError as e:
         print('err', e)
     time.sleep(1)
-    wdt.feed()
 
 c.disconnect()
