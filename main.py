@@ -55,7 +55,7 @@ wdt.feed()
 con.subscribe(b"house/sgp30")
 while True:
     #print("eCO2 = %d ppm \t TVOC = %d ppb" % (sgp30.eCO2, sgp30.TVOC))
-    d = dict(eCO2=sgp30.eCO2, TVOC=sgp30.TVOC)
+    d = dict(eCO2=sgp30.eCO2, TVOC=sgp30.TVOC, Ethanol=sgp30.Ethanol, H2=sgp30.H2)
     elapsed_sec += 1
     if elapsed_sec > 10:
         elapsed_sec = 0
