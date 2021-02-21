@@ -29,9 +29,8 @@ def on_message(client, userdata, message):
         send_buffer.append(point)
     try:
         write_api.write(influx_bucket, influx_org, send_buffer)
-    except Exception as e
+    except Exception as e:
         print(e)
-        pass
 
 
 client.on_message = on_message
